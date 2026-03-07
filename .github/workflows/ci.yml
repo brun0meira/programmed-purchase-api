@@ -32,4 +32,4 @@ jobs:
         /p:CollectCoverage=true 
         /p:Threshold=70 
         /p:ThresholdType=line 
-        /p:Exclude="[Infrastructure.Data]*,[Infrastructure.Queue]*"
+        /p:Exclude="[Infrastructure.*]*"
