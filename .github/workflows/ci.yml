@@ -31,5 +31,6 @@ jobs:
         dotnet test --no-build --configuration Release 
         /p:CollectCoverage=true 
         /p:Threshold=70 
-        /p:ThresholdType=line 
+        /p:ThresholdType=line
+        /p:ThresholdStat=total
         /p:Exclude="[Infrastructure.*]*"
