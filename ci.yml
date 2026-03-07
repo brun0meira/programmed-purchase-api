@@ -1,0 +1,36 @@
+name: Integracao Continua (CI) - Programmed Purchase
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  build-and-test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 📥 Checkout do código
+      uses: actions/checkout@v4
+
+    - name: ⚙️ Setup do ambiente .NET Core
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '9.0.x'
+
+    - name: 📦 Restaurar pacotes (Restore)
+      run: dotnet restore
+
+    - name: 🔨 Compilar o projeto (Build)
+      run: dotnet build --no-restore --configuration Release
+
+    - name: 🧪 Executar Testes Unitários e Validar Cobertura (Threshold 70%)
+      run: >
+        dotnet test --no-build --configuration Release 
+        /p:CollectCoverage=true 
+        /p:Threshold=70 
+        /p:ThresholdType=line 
+        /p:Exclude="[Infrastructure.Data]*"
+        /p:Exclude="[Infrastructure.Queue]*"

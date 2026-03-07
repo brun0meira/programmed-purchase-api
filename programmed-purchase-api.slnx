@@ -1,3 +1,19 @@
 <Solution>
-  <Project Path="Domain/Domain.csproj" />
+  <Folder Name="/Application/">
+    <Project Path="WebApi/WebApi.csproj" Id="dfc65e25-1edb-4b0a-932a-320bace35c96" />
+    <Project Path="WorkerService/WorkerService.csproj" Id="ddcd6742-7139-4551-b782-62fb66e06c24" />
+  </Folder>
+  <Folder Name="/Core/">
+    <Project Path="Domain/Domain.csproj" />
+  </Folder>
+  <Folder Name="/Infrastructure/">
+    <Project Path="Infrastructure.Data/Infrastructure.Data.csproj" />
+    <Project Path="Infrastructure.Queue/Infrastructure.Queue.csproj" Id="f78bdaeb-2fa0-4c44-b850-b7792b9d0a0f" />
+  </Folder>
+  <Folder Name="/Itens de Solução/">
+    <File Path="docker-compose.yml" />
+  </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="Tests/Tests.csproj" Id="443b8467-8e2b-4938-ac95-9d14bbdbd1a6" />
+  </Folder>
 </Solution>
