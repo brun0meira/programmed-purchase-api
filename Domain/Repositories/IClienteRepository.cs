@@ -7,6 +7,7 @@ namespace Domain.Repositories
     {
         Task<bool> CpfExisteAsync(string cpf);
         Task<Cliente> ObterPorIdAsync(long id);
+        Task<Cliente> ObterPorCpfAsync(string cpf);
         Task AdicionarAsync(Cliente cliente);
         Task AtualizarAsync(Cliente cliente);
         Task SalvarAlteracoesAsync();

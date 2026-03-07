@@ -277,5 +277,20 @@ namespace Domain.Business
 
             return response;
         }
+
+        public async Task<ClienteResumoDto> ObterPorCpfAsync(string cpf)
+        {
+            var cliente = await _clienteRepository.ObterPorCpfAsync(cpf);
+
+            if (cliente == null)
+                throw new InvalidOperationException("CLIENTE_NAO_ENCONTRADO|CPF não cadastrado na base.");
+
+            return new ClienteResumoDto
+            {
+                Id = cliente.Id,
+                Nome = cliente.Nome,
+                ValorMensal = cliente.ValorMensal
+            };
+        }
     }
 }

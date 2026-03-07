@@ -1,9 +1,10 @@
-using System;
-using System.Threading.Tasks;
 using Domain.Business;
 using Domain.Dto.Cliente;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Threading.Tasks;
 
 namespace ProjectWebAPI.Controllers
 {
@@ -141,6 +142,20 @@ namespace ProjectWebAPI.Controllers
             {
                 var partes = ex.Message.Split('|');
                 return NotFound(new ErroResponseDto { Codigo = partes[0], Erro = partes[1] });
+            }
+        }
+
+        [HttpGet("cpf/{cpf}")]
+        public async Task<IActionResult> ObterPorCpf(string cpf)
+        {
+            try
+            {
+                var response = await _clienteService.ObterPorCpfAsync(cpf);
+                return Ok(response);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return NotFound(new { message = ex.Message });
             }
         }
     }

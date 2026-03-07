@@ -1,4 +1,8 @@
 <Solution>
+  <Folder Name="/.github/" />
+  <Folder Name="/.github/workflows/">
+    <File Path="ci.yml" />
+  </Folder>
   <Folder Name="/Application/">
     <Project Path="WebApi/WebApi.csproj" Id="dfc65e25-1edb-4b0a-932a-320bace35c96" />
     <Project Path="WorkerService/WorkerService.csproj" Id="ddcd6742-7139-4551-b782-62fb66e06c24" />

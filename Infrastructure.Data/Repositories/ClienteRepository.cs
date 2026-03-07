@@ -64,5 +64,11 @@ namespace Infrastructure.Data.Repositories
                 .Where(c => c.Ativo)
                 .ToListAsync();
         }
+
+        public async Task<Cliente> ObterPorCpfAsync(string cpf)
+        {
+            return await _context.Clientes
+                                 .FirstOrDefaultAsync(c => c.Cpf == cpf);
+        }
     }
 }
