@@ -1,17 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Domain.Dto.Motor;
+﻿using Domain.Dto.Motor;
 using Domain.Entities;
 using Domain.Enums;
 using Domain.ExternalServices;
 using Domain.Repositories;
+using Prometheus;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.Metrics;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Domain.Business
 {
     public class MotorCompraService : IMotorCompraService
     {
+        private static readonly Counter ClientesProcessadosCounter = Metrics
+            .CreateCounter("itau_motor_clientes_processados_total", "Total de clientes processados pelo rateio do motor.");
+
+        private static readonly Counter VolumeFinanceiroCounter = Metrics
+            .CreateCounter("itau_motor_volume_reais_total", "Volume financeiro total (R$) movimentado no mercado.");
+
+        private static readonly Counter EventosKafkaCounter = Metrics
+            .CreateCounter("itau_motor_eventos_kafka_total", "Total de eventos de IR (Dedo-Duro) disparados para o Kafka.");
+
         private readonly IClienteRepository _clienteRepository;
         private readonly IContaRepository _contaRepository;
         private readonly ICestaRepository _cestaRepository;
@@ -60,6 +71,8 @@ namespace Domain.Business
                 c => Math.Round(c.ValorMensal / 3, 2)
             );
             decimal totalConsolidado = aportesClientes.Values.Sum();
+
+            VolumeFinanceiroCounter.Inc((double)totalConsolidado);
 
             var response = new ExecutarCompraResponseDto
             {
@@ -217,6 +230,7 @@ namespace Domain.Business
 
                             await _kafkaProducerService.PublicarEventoIRAsync(cliente.Id, "DEDO_DURO", valorOperacao, irDedoDuro, request.DataReferencia);
                             eventosKafkaCount++;
+                            EventosKafkaCounter.Inc();
                         }
                     }
                 }
@@ -247,6 +261,8 @@ namespace Domain.Business
                     custodiaMaster.Quantidade = 0; // Zerou a Master
                 }
             }
+
+            ClientesProcessadosCounter.Inc(clientesAtivos.Count);
 
             response.EventosIRPublicados = eventosKafkaCount;
 

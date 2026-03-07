@@ -12,7 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using System;
 using Infrastructure.Queue;
-
+using Prometheus;
 public class Startup
 {
     public IConfiguration Configuration { get; }
@@ -83,6 +83,8 @@ public class Startup
 
         app.UseRouting();
 
+        app.UseHttpMetrics();
+
         app.UseCors("AllowAll");
 
         app.UseAuthorization();
@@ -90,6 +92,8 @@ public class Startup
         app.UseEndpoints(endpoints =>
         {
             endpoints.MapControllers();
+
+            endpoints.MapMetrics();
         });
     }
 }
