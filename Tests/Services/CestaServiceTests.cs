@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Domain.Business;
 using Domain.Dto.Admin;
 using Domain.Entities;
+using Domain.ExternalServices;
 using Domain.Repositories;
 using Moq;
 using Xunit;
@@ -14,12 +15,14 @@ namespace Tests.Services
     public class CestaServiceTests
     {
         private readonly Mock<ICestaRepository> _cestaRepoMock;
+        private readonly Mock<ICotacaoB3Service> _cotacaoB3Mock;
         private readonly CestaService _service;
 
         public CestaServiceTests()
         {
             _cestaRepoMock = new Mock<ICestaRepository>();
-            _service = new CestaService(_cestaRepoMock.Object);
+            _cotacaoB3Mock = new Mock<ICotacaoB3Service>();
+            _service = new CestaService(_cestaRepoMock.Object, _cotacaoB3Mock.Object);
         }
 
         // 1. Cadastrar Cesta (Regras e Rebalanceamento)
@@ -71,10 +74,8 @@ namespace Tests.Services
             // Arrange
             var request = CriarRequestValido();
 
-            // Simula que o banco não tem nenhuma cesta ativa
-            _cestaRepoMock.Setup(r => r.ObterCestaAtualAsync()).ReturnsAsync((CestaRecomendacao)null);
+            _cestaRepoMock.Setup(r => r.ObterCestaAtualAsync()).ReturnsAsync((CestaRecomendacao?)null);
 
-            // Simula o ID gerado ao salvar
             _cestaRepoMock.Setup(r => r.AdicionarAsync(It.IsAny<CestaRecomendacao>()))
                           .Callback<CestaRecomendacao>(c => c.Id = 1)
                           .Returns(Task.CompletedTask);
@@ -118,7 +119,7 @@ namespace Tests.Services
 
             // Assert
             Assert.True(resultado.RebalanceamentoDisparado);
-            Assert.False(cestaAnterior.Ativa); // Garante que a entidade antiga foi inativada
+            Assert.False(cestaAnterior.Ativa);
 
             // Valida o cálculo matemático do Diff (Quem entrou e quem saiu)
             Assert.Contains("A5", resultado.AtivosAdicionados);
@@ -136,21 +137,34 @@ namespace Tests.Services
         public async Task ConsultarCestaAtual_DeveRetornarCesta()
         {
             // Arrange
-            var cestaAtual = new CestaRecomendacao { Id = 1, Nome = "Cesta Ativa", Ativa = true };
+            var cestaAtual = new CestaRecomendacao
+            {
+                Id = 1,
+                Nome = "Cesta Ativa",
+                Ativa = true,
+                Itens = new List<ItemCesta> { new ItemCesta { Ticker = "A1", Percentual = 100 } }
+            };
+
             _cestaRepoMock.Setup(r => r.ObterCestaAtualAsync()).ReturnsAsync(cestaAtual);
+
+            // Simulamos a B3 retornando o preço de A1
+            var cotacoesB3 = new Dictionary<string, decimal> { { "A1", 15.50m } };
+            _cotacaoB3Mock.Setup(s => s.ObterCotacoesFechamentoAsync(It.IsAny<DateTime>(), It.IsAny<List<string>>()))
+                          .ReturnsAsync(cotacoesB3);
 
             // Act
             var resultado = await _service.ConsultarCestaAtualAsync();
 
             // Assert
             Assert.Equal("Cesta Ativa", resultado.Nome);
+            Assert.Equal(15.50m, resultado.Itens.First().CotacaoAtual);
         }
 
         [Fact(DisplayName = "Consultar Cesta Atual - Deve lançar erro se banco estiver vazio")]
         public async Task ConsultarCestaAtual_DeveLancarErro_QuandoNaoHouverCesta()
         {
             // Arrange
-            _cestaRepoMock.Setup(r => r.ObterCestaAtualAsync()).ReturnsAsync((CestaRecomendacao)null);
+            _cestaRepoMock.Setup(r => r.ObterCestaAtualAsync()).ReturnsAsync((CestaRecomendacao?)null);
 
             // Act & Assert
             var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => _service.ConsultarCestaAtualAsync());
