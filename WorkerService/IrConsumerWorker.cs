@@ -15,16 +15,16 @@ namespace WorkerService
     public class IrConsumerWorker : BackgroundService
     {
         private readonly ILogger<IrConsumerWorker> _logger;
-        private readonly IServiceProvider _serviceProvider;
+        private readonly IServiceScopeFactory _scopeFactory;
         private readonly IConfiguration _configuration;
         private readonly string _bootstrapServers;
         private readonly string _topicName = "topico-eventos-ir";
         private readonly string _groupId = "grupo-receita-federal";
 
-        public IrConsumerWorker(ILogger<IrConsumerWorker> logger, IServiceProvider serviceProvider, IConfiguration configuration)
+        public IrConsumerWorker(ILogger<IrConsumerWorker> logger, IServiceScopeFactory scopeFactory, IConfiguration configuration)
         {
             _logger = logger;
-            _serviceProvider = serviceProvider;
+            _scopeFactory = scopeFactory;
             _configuration = configuration;
             _bootstrapServers = _configuration["Kafka:BootstrapServers"] ?? "localhost:9092";
         }
@@ -54,18 +54,15 @@ namespace WorkerService
 
                         _logger.LogInformation($"\n[RECEITA FEDERAL] Processando IR... Offset: {consumeResult.Offset}");
 
-                        // 1. Desserializar a mensagem
                         using var doc = JsonDocument.Parse(mensagemJson);
                         var clienteId = doc.RootElement.GetProperty("ClienteId").GetInt64();
                         var valorIr = doc.RootElement.GetProperty("ValorIR").GetDecimal();
                         var dataRef = doc.RootElement.GetProperty("DataReferencia").GetString();
 
-                        // 2. Abrir um escopo para usar o Entity Framework no Worker
-                        using (var scope = _serviceProvider.CreateScope())
+                        using (var scope = _scopeFactory.CreateScope())
                         {
                             var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-                            // 3. Buscar o evento pendente no banco e atualizar
                             var eventoPendente = await dbContext.EventosIR
                                 .FirstOrDefaultAsync(e => e.ClienteId == clienteId
                                                        && e.ValorIR == valorIr
