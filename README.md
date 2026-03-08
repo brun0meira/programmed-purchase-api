@@ -42,6 +42,7 @@ O **Programmed Purchase API** é um sistema robusto de investimento automatizado
 2. **Compra Consolidada** – Motor de Compra executa compras fracionadas (1/3 do aporte).  
 3. **Distribuição Proporcional** – Ações são distribuídas para a custódia individual de cada cliente.  
 4. **Gestão Automática** – Sistema mantém preço médio de aquisição atualizado e calcula IR retido.
+4. **Rebalanceamento de Carteira** – O motor identifica alterações na cesta, liquida ativos removidos apurando impostos sobre lucros (via Kafka), e reinveste o capital na nova composição.
 
 ---
 
@@ -71,7 +72,9 @@ programmed-purchase-api/
 │   │   ├── MotorCompraService.cs    # Motor de compra programada
 │   │   ├── CestaService.cs          # Gestão de cestas Top Five
 │   │   ├── ClienteService.cs        # Gestão de clientes
-│   │   └── ContaMasterService.cs    # Gerência de conta consolidada
+│   │   ├── ContaMasterService.cs    # Gerência de conta 
+│   │   └── RebalanceamentoService.cs  # Gerência da carteira 
+consolidada
 │   ├── Entities/                    # Modelos de domínio
 │   ├── Dto/                         # Data Transfer Objects
 │   ├── Enum/                        # Enumerações
@@ -216,6 +219,13 @@ Compra de **350 ações de PETR4**
 ## ✓ Gestão de Impostos (Dedo-Duro + Kafka)
 
 Cálculo de **0,005%** sobre o valor operado de cada cliente.
+
+## ✓ Rebalanceamento de Carteira e Apuração Fiscal
+
+- Liquidação automática de posições em ativos que foram removidos da cesta "Top Five" vigente
+- Validação da regra da B3 de **isenção de IR** para vendas de até R$ 20.000,00 dentro do mesmo mês
+- Cálculo exato de **20% de imposto** sobre o lucro líquido (Preço de Venda vs Preço Médio), com disparo do evento fiscal via **Apache Kafka**
+- Reinvestimento proporcional do capital gerado nas novas ações da cesta e atualização imediata da custódia
 
 ### Fluxo
 

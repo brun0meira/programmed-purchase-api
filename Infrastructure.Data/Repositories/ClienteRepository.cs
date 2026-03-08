@@ -70,5 +70,14 @@ namespace Infrastructure.Data.Repositories
             return await _context.Clientes
                                  .FirstOrDefaultAsync(c => c.Cpf == cpf);
         }
+
+        public async Task<decimal> ObterTotalVendasMesAsync(long clienteId, int mes, int ano)
+        {
+            return await _context.Rebalanceamentos
+                .Where(r => r.ClienteId == clienteId
+                         && r.DataRebalanceamento.Month == mes
+                         && r.DataRebalanceamento.Year == ano)
+                .SumAsync(r => r.ValorVenda);
+        }
     }
 }

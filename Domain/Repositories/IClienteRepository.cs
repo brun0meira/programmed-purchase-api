@@ -14,5 +14,6 @@ namespace Domain.Repositories
         Task<Cliente> ObterClienteComCustodiaAsync(long id);
         Task<Cliente> ObterClienteComHistoricoAsync(long id);
         Task<List<Cliente>> ObterClientesAtivosComCustodiaAsync();
+        Task<decimal> ObterTotalVendasMesAsync(long clienteId, int mes, int ano);
     }
 }

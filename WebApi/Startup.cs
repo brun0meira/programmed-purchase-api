@@ -60,11 +60,13 @@ public class Startup
         services.AddScoped<IClienteRepository, ClienteRepository>();
         services.AddScoped<ICestaRepository, CestaRepository>();
         services.AddScoped<IContaRepository, ContaRepository>();
+        services.AddScoped<IRebalanceamentoRepository, RebalanceamentoRepository>();
 
         // Business (Services)
         services.AddScoped<IContaMasterService, ContaMasterService>();
         services.AddScoped<IClienteService, ClienteService>();
         services.AddScoped<ICestaService, CestaService>();
+        services.AddScoped<IRebalanceamentoService, RebalanceamentoService>();
         services.AddScoped<IMotorCompraService, MotorCompraService>();
         services.AddScoped<IKafkaProducerService, KafkaProducerService>();
 
