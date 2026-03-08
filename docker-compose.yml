@@ -74,7 +74,7 @@ services:
       - mysql
       - kafka
     ports:
-      - "80:8080" 
+      - "8080:80" 
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ConnectionStrings__DefaultConnection=Server=mysql;Port=3306;Database=${MYSQL_DATABASE};Uid=root;Pwd=${MYSQL_ROOT_PASSWORD};
