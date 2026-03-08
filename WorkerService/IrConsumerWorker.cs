@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Confluent.Kafka;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -15,14 +16,17 @@ namespace WorkerService
     {
         private readonly ILogger<IrConsumerWorker> _logger;
         private readonly IServiceProvider _serviceProvider;
-        private readonly string _bootstrapServers = "localhost:9092";
+        private readonly IConfiguration _configuration;
+        private readonly string _bootstrapServers;
         private readonly string _topicName = "topico-eventos-ir";
         private readonly string _groupId = "grupo-receita-federal";
 
-        public IrConsumerWorker(ILogger<IrConsumerWorker> logger, IServiceProvider serviceProvider)
+        public IrConsumerWorker(ILogger<IrConsumerWorker> logger, IServiceProvider serviceProvider, IConfiguration configuration)
         {
             _logger = logger;
             _serviceProvider = serviceProvider;
+            _configuration = configuration;
+            _bootstrapServers = _configuration["Kafka:BootstrapServers"] ?? "localhost:9092";
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)

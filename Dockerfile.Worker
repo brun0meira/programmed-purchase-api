@@ -1,0 +1,18 @@
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+WORKDIR /src
+
+COPY ["WorkerService/WorkerService.csproj", "WorkerService/"]
+COPY ["Domain/Domain.csproj", "Domain/"]
+COPY ["Infrastructure.Data/Infrastructure.Data.csproj", "Infrastructure.Data/"]
+COPY ["Infrastructure.Queue/Infrastructure.Queue.csproj", "Infrastructure.Queue/"]
+
+RUN dotnet restore "WorkerService/WorkerService.csproj"
+
+COPY . .
+WORKDIR "/src/WorkerService"
+RUN dotnet publish -c Release -o /app/publish
+
+FROM mcr.microsoft.com/dotnet/runtime:9.0 AS runtime
+WORKDIR /app
+COPY --from=build /app/publish .
+ENTRYPOINT ["dotnet", "WorkerService.dll"]

@@ -24,4 +24,10 @@
     <ProjectReference Include="..\Infrastructure.Queue\Infrastructure.Queue.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="cotacoes\**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

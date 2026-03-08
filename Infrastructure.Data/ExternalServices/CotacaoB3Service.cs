@@ -14,7 +14,7 @@ namespace Infrastructure.Data.ExternalServices
         public async Task<Dictionary<string, decimal>> ObterCotacoesFechamentoAsync(DateTime dataReferencia, List<string> tickers)
         {
             // cotacoes na raiz da WebAPI
-            var pastaCotacoes = Path.Combine(Directory.GetCurrentDirectory(), "cotacoes");
+            var pastaCotacoes = Path.Combine(AppContext.BaseDirectory, "cotacoes");
 
             if (!Directory.Exists(pastaCotacoes))
                 throw new DirectoryNotFoundException($"A pasta {pastaCotacoes} não foi encontrada.");

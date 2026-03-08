@@ -3,13 +3,19 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Confluent.Kafka;
 using Domain.ExternalServices;
+using Microsoft.Extensions.Configuration;
 
 namespace Infrastructure.Queue
 {
     public class KafkaProducerService : IKafkaProducerService
     {
-        private readonly string _bootstrapServers = "localhost:9092";
+        private readonly string _bootstrapServers;
         private readonly string _topicName = "topico-eventos-ir";
+
+        public KafkaProducerService(IConfiguration configuration)
+        {
+            _bootstrapServers = configuration["Kafka:BootstrapServers"] ?? "localhost:9092";
+        }
 
         public async Task PublicarEventoIRAsync(long clienteId, string tipoEvento, decimal valorOperacao, decimal valorIR, string dataReferencia)
         {
