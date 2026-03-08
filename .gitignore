@@ -1,5 +1,6 @@
 .vs/
 bin/
+.env
 obj/
 *.user
 *.suo
