@@ -224,7 +224,7 @@ Cálculo de **0,005%** sobre o valor operado de cada cliente.
 
 - Liquidação automática de posições em ativos que foram removidos da cesta "Top Five" vigente
 - Validação da regra da B3 de **isenção de IR** para vendas de até R$ 20.000,00 dentro do mesmo mês
-- Cálculo exato de **20% de imposto** sobre o lucro líquido (Preço de Venda vs Preço Médio), com disparo do evento fiscal via **Apache Kafka**
+- Cálculo exato de **20% de imposto** sobre o lucro líquido (Preço de Venda vs Preço Médio) e retenção de **0,005% de IR Dedo-Duro** sobre o valor bruto, com disparo do evento fiscal via **Apache Kafka**
 - Reinvestimento proporcional do capital gerado nas novas ações da cesta e atualização imediata da custódia
 
 ### Fluxo

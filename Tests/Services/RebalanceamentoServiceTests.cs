@@ -147,6 +147,7 @@ namespace Tests.Services
             // Total do mês = 15k + 50k = 65.000 (Passou de 20k!)
             // Lucro = (50 - 40) * 1000 = 10.000 de Lucro.
             // IR 20% sobre 10.000 = R$ 2.000,00.
+            // IR Dedo-Duro 0,005% sobre 50.000 = R$ 2,50.
             await _rebalanceamentoService.ExecutarRebalanceamentoAsync(dataReferencia);
 
             // Assert
@@ -155,7 +156,7 @@ namespace Tests.Services
                     1,
                     "IR_VENDA_REBALANCEAMENTO",
                     10000m, // Lucro
-                    2000m,  // Imposto de 20%
+                    2002.50m,  // Imposto de 20% + Dedo-Duro
                     "2026-03-17"),
                 Times.Once); // GARANTE QUE COBROU EXATAMENTE 1 VEZ NO KAFKA
         }

@@ -97,9 +97,16 @@ namespace Domain.Business
                     // Regra da B3: isenção de IR para vendas até 20 mil por mês. Se passar disso, calcula o imposto sobre o lucro e envia para o Kafka
                     if (totalVendasMes > 20000m && lucroLiquido > 0)
                     {
-                        decimal impostoDevido = Math.Round(lucroLiquido * 0.20m, 2);
+                        decimal impostoDevido = Math.Round(lucroLiquido * 0.20m, 2); // 20% sobre o lucro
+                        decimal dedoDuro = Math.Round(valorVenda * 0.00005m, 2); // 0,005% sobre o valor bruto da VENDA
+
+                        // Envia o imposto total
                         await _kafkaProducerService.PublicarEventoIRAsync(
-                            cliente.Id, "IR_VENDA_REBALANCEAMENTO", lucroLiquido, impostoDevido, dataReferencia.ToString("yyyy-MM-dd")
+                            cliente.Id,
+                            "IR_VENDA_REBALANCEAMENTO",
+                            lucroLiquido,
+                            impostoDevido + dedoDuro, // Somando os dois
+                            dataReferencia.ToString("yyyy-MM-dd")
                         );
                     }
 
